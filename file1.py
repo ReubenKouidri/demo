@@ -1,8 +1,20 @@
-# some random text
+import cProfile, pstats, io
 
 
-def func1():
-    return 1
+def profile(fnc):
+    """ decorator that uses cProfile to profile a function """
 
-def func2():
-    return 2
+    def inner(*args, **kwargs):
+        pr = cProfile.Profile()
+        pr.enable()
+        retval = fnc(*args, **kwargs)
+        pr.disable()
+        s = io.StringIO()
+        ps = pstats.Stats(pr, stream=s).sort_stats('cumulative')
+        ps.print_stats()
+        print(s.getvalue())
+        return retval
+
+    return inner
+
+
